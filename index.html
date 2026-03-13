@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>live.cd — Pronos & Scores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#16a34a;--green-b:#22c55e;--green-glow:rgba(34,197,94,0.15);
+  --red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;
+  --bg:#080808;--bg2:#0f0f0f;--bg3:#181818;--bg4:#212121;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#f0f0f0;--muted:#5a5a5a;--dim:#2e2e2e;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:78px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 35% at 50% -5%,rgba(22,163,74,0.09) 0%,transparent 65%),linear-gradient(rgba(22,163,74,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(22,163,74,0.022) 1px,transparent 1px);background-size:100% 100%,48px 48px,48px 48px;pointer-events:none;z-index:0}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.93);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;line-height:1}
+.logo em{color:var(--green-b);font-style:normal}
+.hright{display:flex;align-items:center;gap:8px}
+.live-pill{display:flex;align-items:center;gap:5px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.28);color:var(--red);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px;border-radius:4px}
+.live-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.icon-btn{width:34px;height:34px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
+
+/* TABS */
+.tabs{display:flex;gap:6px;padding:12px 16px 0;overflow-x:auto;scrollbar-width:none;position:relative;z-index:1}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap}
+.tab.active{background:var(--green);border-color:var(--green);color:#fff}
+
+/* STATS STRIP */
+.ss{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px 0;position:relative;z-index:1}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:11px 10px;text-align:center}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--green-b);line-height:1}
+.sl{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 10px;position:relative;z-index:1}
+.sh-t{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px}
+.sh-b{font-size:10px;color:var(--muted);background:var(--bg3);padding:3px 9px;border-radius:10px;border:1px solid var(--border)}
+
+/* ═══════════════════════════
+   PRONO CARD
+═══════════════════════════ */
+.prono-list{display:flex;flex-direction:column;gap:12px;padding:0 16px;position:relative;z-index:1}
+
+.pc{background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .2s,transform .15s;position:relative}
+.pc:hover{border-color:rgba(255,255,255,.11);transform:translateY(-1px)}
+.pc.feat{border-color:var(--green);box-shadow:0 0 36px rgba(22,163,74,.1)}
+
+/* Barre accent couleur */
+.acc{height:3px;width:100%}
+.acc-1{background:linear-gradient(90deg,var(--green-b) 0%,rgba(34,197,94,.2) 60%,transparent 100%)}
+.acc-n{background:linear-gradient(90deg,transparent 10%,var(--amber) 50%,transparent 90%)}
+.acc-2{background:linear-gradient(90deg,transparent 0%,rgba(239,68,68,.2) 40%,var(--red) 100%)}
+
+/* Ribbon vedette */
+.ribbon{display:inline-flex;align-items:center;gap:4px;background:var(--green);color:#fff;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:3px;position:absolute;top:16px;right:14px}
+
+/* Meta */
+.pm{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0}
+.pl{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:500}
+.pt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);background:var(--bg3);padding:3px 8px;border-radius:6px}
+
+/* Corps équipes */
+.pb{display:grid;grid-template-columns:1fr 80px 1fr;align-items:center;gap:4px;padding:12px 14px 10px}
+
+.ts{display:flex;flex-direction:column;gap:5px}
+.ts.home{align-items:flex-start}
+.ts.away{align-items:flex-end}
+.tn{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;line-height:1}
+.tc{font-size:10px;color:var(--muted)}
+
+/* Forme */
+.fr{display:flex;gap:3px}
+.fd{width:15px;height:15px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.fw{background:rgba(34,197,94,.18);color:var(--green-b)}
+.fdraw{background:rgba(245,158,11,.18);color:var(--amber)}
+.fl{background:rgba(239,68,68,.18);color:var(--red)}
+
+/* Centre */
+.vc{display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 6px}
+.vl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px}
+
+/* ★ JAUGE FORCE */
+.gauge-wrap{width:100%;display:flex;flex-direction:column;gap:3px}
+.g-track{width:100%;height:7px;background:var(--bg4);border-radius:4px;overflow:hidden;display:flex}
+.g-h{height:100%;border-radius:4px 0 0 4px;background:var(--green-b);transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+.g-a{height:100%;border-radius:0 4px 4px 0;background:var(--red);transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+.g-nums{width:100%;display:flex;justify-content:space-between}
+.gnh{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green-b);font-weight:700}
+.gna{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--red);font-weight:700}
+
+/* Résultat central */
+.pr{display:flex;flex-direction:column;align-items:center;gap:2px}
+.prl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.prv{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
+.prc{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;padding:3px 9px;border-radius:6px}
+.r1 .prv{color:var(--green-b)} .r1 .prc{background:rgba(34,197,94,.12);color:var(--green-b)}
+.rn .prv{color:var(--amber)}   .rn .prc{background:rgba(245,158,11,.12);color:var(--amber)}
+.r2 .prv{color:var(--red)}     .r2 .prc{background:rgba(239,68,68,.12);color:var(--red)}
+
+/* Stats row */
+.sr{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border)}
+.stc{padding:8px 10px;text-align:center;border-right:1px solid var(--border)}
+.stc:last-child{border-right:none}
+.stv{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--text)}
+.stk{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+
+/* xG row */
+.xgr{padding:8px 14px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px}
+.xgl{font-size:10px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.xgt-tag{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+.xg-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;display:flex}
+.xgh{height:100%;border-radius:3px 0 0 3px;background:var(--green-b);transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+.xga{height:100%;border-radius:0 3px 3px 0;background:var(--red);transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+.xg-labs{display:flex;justify-content:space-between;font-size:10px}
+.xg-lh{color:var(--green-b)} .xg-la{color:var(--red)}
+
+/* IA bar */
+.ia-bar{border-top:1px solid var(--border);display:flex;align-items:stretch}
+.ia-btn{flex:1;background:none;border:none;padding:11px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;transition:background .15s,color .15s;text-align:left}
+.ia-btn:hover{background:rgba(34,197,94,.05);color:var(--text)}
+.ia-chip{font-size:10px;background:var(--green-glow);color:var(--green-b);padding:2px 7px;border-radius:4px;font-weight:600;margin-left:auto}
+.wa-btn{border-left:1px solid var(--border);border-top:none;border-right:none;border-bottom:none;padding:0 16px;background:none;cursor:pointer;font-size:18px;transition:background .15s}
+.wa-btn:hover{background:rgba(37,211,102,.08)}
+
+/* IA panel */
+.ia-panel{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.16,1,.3,1)}
+.ia-panel.open{max-height:320px}
+.ia-inner{padding:12px 14px 14px;border-top:1px solid var(--border);font-size:12.5px;line-height:1.8;color:#7a7a7a;white-space:pre-wrap;font-style:italic}
+.cur{display:inline-block;width:2px;height:13px;background:var(--green-b);animation:cblink .8s step-end infinite;vertical-align:text-bottom;margin-left:1px}
+@keyframes cblink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* SCORES LIVE */
+.ml{display:flex;flex-direction:column;gap:6px;padding:0 16px;position:relative;z-index:1}
+.mr{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1fr 86px 1fr;align-items:center;cursor:pointer;transition:border-color .18s}
+.mr:hover{border-color:rgba(255,255,255,.1)}
+.mt{font-size:13px;font-weight:500}
+.mt.h{text-align:right} .mt.a{text-align:left}
+.mc{text-align:center}
+.ms{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--green-b)}
+.mtime{font-size:10px;color:var(--red);font-weight:600;margin-top:1px}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:62px;background:rgba(8,8,8,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.ni{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--dim);font-size:10px;font-weight:500;border:none;background:none;transition:color .15s}
+.ni.active{color:var(--green-b)}
+.ni-i{font-size:20px;line-height:1}
+
+/* TOAST */
+.toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:24px;font-size:12.5px;font-weight:500;opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);pointer-events:none;white-space:nowrap;z-index:200}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* REVEAL */
+.rev{opacity:0;transform:translateY(14px);animation:rup .5s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes rup{to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">LIVE<em>.</em>CD</div>
+  <div class="hright">
+    <div class="live-pill"><div class="live-dot"></div>Live</div>
+    <div class="icon-btn">🔔</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active">Pronos IA</button>
+  <button class="tab">Scores live</button>
+  <button class="tab">Vodacom Ligue</button>
+  <button class="tab">CAN 2025</button>
+  <button class="tab">Ligue 1</button>
+  <button class="tab">Premier League</button>
+  <button class="tab">Champions L.</button>
+</div>
+
+<div class="ss">
+  <div class="sc rev"><div class="sn">8</div><div class="sl">Pronos du jour</div></div>
+  <div class="sc rev" style="animation-delay:.06s"><div class="sn">71<span style="font-size:14px">%</span></div><div class="sl">Réussite 7j</div></div>
+  <div class="sc rev" style="animation-delay:.12s"><div class="sn">4</div><div class="sl">Matchs live</div></div>
+</div>
+
+<div class="sh" style="margin-top:4px">
+  <span class="sh-t">Pronostics IA</span>
+  <span class="sh-b">Analyse stats + IA</span>
+</div>
+
+<div class="prono-list" id="pronoList"></div>
+
+<div class="sh" style="margin-top:8px">
+  <span class="sh-t">Scores en cours</span>
+  <span class="sh-b">4 live</span>
+</div>
+
+<div class="ml" id="matchList"></div>
+
+<nav class="bnav">
+  <button class="ni active"><span class="ni-i">⚡</span><span>Pronos</span></button>
+  <button class="ni"><span class="ni-i">📺</span><span>Live</span></button>
+  <button class="ni"><span class="ni-i">📰</span><span>Actu</span></button>
+  <button class="ni"><span class="ni-i">👤</span><span>Profil</span></button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const PRONOS = [
+  {
+    feat:true, league:'🇫🇷 Ligue 1', time:'21:00',
+    home:{name:'PSG',country:'Paris',form:['W','W','D','W','W'],str:78},
+    away:{name:'OM',country:'Marseille',form:['W','L','W','D','L'],str:52},
+    res:'1',resLabel:'Victoire PSG',cote:'1.72',
+    stats:{h2h:'7-2-3',btts:'62%',o25:'74%'},xgH:70,xgA:30,
+    ia:`PSG domine cette saison avec 22 pts d'avance. Mbappé en forme record (18 buts), l'OM encaisse en moyenne 1.8 buts/match à l'extérieur.\n\n📊 H2H récent : PSG remporte 7 des 12 derniers clasicos.\n⚠️ Absent PSG : Hakimi (suspendu) — impact flanc droit.\n\n✅ Recommandation : 1 + Plus de 2.5 buts @ 2.10\nConfiance : 🟢 Élevée (78%)`
+  },
+  {
+    feat:false, league:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League', time:'17:30',
+    home:{name:'Arsenal',country:'Londres',form:['W','W','W','D','W'],str:74},
+    away:{name:'Chelsea',country:'Londres',form:['D','W','L','W','D'],str:58},
+    res:'1',resLabel:'Victoire Arsenal',cote:'2.05',
+    stats:{h2h:'5-3-4',btts:'55%',o25:'58%'},xgH:63,xgA:37,
+    ia:`Arsenal est en grande forme à l'Emirates — 9V 1N 1D à domicile cette saison. Chelsea irrégulier, a perdu 3 des 6 derniers derbys londoniens.\n\n📊 Arsenal marque en 1re mi-temps dans 70% de ses matchs à domicile.\n\n✅ Recommandation : 1 mi-temps @ 1.85\nConfiance : 🟡 Moyenne (63%)`
+  },
+  {
+    feat:false, league:'🇪🇸 La Liga', time:'20:00',
+    home:{name:'Barça',country:'Barcelone',form:['W','W','W','L','W'],str:72},
+    away:{name:'Atlético',country:'Madrid',form:['W','D','W','W','D'],str:69},
+    res:'N',resLabel:'Nul probable',cote:'3.40',
+    stats:{h2h:'4-5-3',btts:'68%',o25:'52%'},xgH:52,xgA:48,
+    ia:`Équilibre parfait. L'Atlético excelle dans les défenses compactes et a neutralisé le Barça 3 fois lors des 6 dernières rencontres au Camp Nou.\n\n📊 Barça: 2+ buts dans seulement 35% des chocs directs vs top 5.\nAtlético: 4 nuls sur les 7 derniers déplacements en Liga.\n\n✅ Recommandation : Nul @ 3.40 (value bet)\nConfiance : 🟡 Moyenne (54%)`
+  },
+  {
+    feat:false, league:'🇩🇪 Bundesliga', time:'18:30',
+    home:{name:'Bayern',country:'Munich',form:['W','W','W','W','D'],str:83},
+    away:{name:'Leipzig',country:'Leipzig',form:['W','L','W','D','W'],str:60},
+    res:'1',resLabel:'Victoire Bayern',cote:'1.58',
+    stats:{h2h:'8-1-3',btts:'71%',o25:'82%'},xgH:73,xgA:27,
+    ia:`Bayern en mode bulldozer : 14 matchs sans défaite à l'Allianz Arena. Kane intouchable (23 buts en 24 j). Leipzig n'a gagné à Munich qu'une seule fois en 10 ans.\n\n📊 Bayern: 82% des matchs à domicile finissent à +2.5 buts.\n\n✅ Recommandation : 1 + Plus de 3.5 buts @ 2.40\nConfiance : 🟢 Élevée (83%)`
+  },
+  {
+    feat:false, league:'🌍 CAF Champions League', time:'16:00',
+    home:{name:'TP Mazembe',country:'Lubumbashi',form:['W','W','D','W','L'],str:66},
+    away:{name:'Simba SC',country:'Dar es Salaam',form:['D','W','W','L','W'],str:58},
+    res:'1',resLabel:'Victoire Mazembe',cote:'2.10',
+    stats:{h2h:'3-2-1',btts:'40%',o25:'45%'},xgH:60,xgA:40,
+    ia:`Mazembe reste redoutable à domicile au Stade TP Mazembe. Le public de Lubumbashi est un 12e homme décisif. Simba SC, en forme mais novice dans les grands rendez-vous CAF.\n\n📊 Mazembe: 80% de victoires à domicile en groupes CAF.\n\n✅ Recommandation : 1 @ 2.10\nConfiance : 🟢 Élevée (66%)`
+  },
+  {
+    feat:false, league:'🇮🇹 Serie A', time:'20:45',
+    home:{name:'Inter',country:'Milan',form:['W','D','W','W','W'],str:76},
+    away:{name:'Juventus',country:'Turin',form:['W','W','D','L','W'],str:62},
+    res:'1',resLabel:'Victoire Inter',cote:'2.00',
+    stats:{h2h:'6-4-2',btts:'58%',o25:'62%'},xgH:65,xgA:35,
+    ia:`Derby d'Italia à l'avantage d'Inter cette saison. Lautaro Martinez intouchable, Thuram en grande forme. La Juve peine à s'imposer à San Siro depuis 2021.\n\n📊 Inter: meilleure défense de Serie A (0.7 but encaissé/match à domicile).\n\n✅ Recommandation : 1 + Moins de 3.5 buts @ 1.90\nConfiance : 🟢 Élevée (76%)`
+  },
+  {
+    feat:false, league:'🇵🇹 Liga Portugal', time:'22:15',
+    home:{name:'Benfica',country:'Lisbonne',form:['W','W','W','D','W'],str:71},
+    away:{name:'Porto',country:'Porto',form:['W','D','W','W','L'],str:65},
+    res:'1',resLabel:'Victoire Benfica',cote:'2.15',
+    stats:{h2h:'5-3-4',btts:'65%',o25:'70%'},xgH:62,xgA:38,
+    ia:`O Clásico portugais est toujours imprévisible mais Benfica a l'avantage à domicile avec Di María en grande forme. Porto encaisse davantage en déplacement (1.4/match).\n\n📊 Benfica: 5V lors des 6 derniers derbys à Lisbonne.\n\n✅ Recommandation : 1 + Les deux équipes marquent @ 2.80\nConfiance : 🟡 Moyenne (61%)`
+  },
+  {
+    feat:false, league:'🇳🇬 NPFL Nigeria', time:'15:00',
+    home:{name:'Enyimba',country:'Aba',form:['W','D','W','D','W'],str:62},
+    away:{name:'Rangers Int.',country:'Enugu',form:['L','W','D','W','W'],str:58},
+    res:'N',resLabel:'Match nul',cote:'3.10',
+    stats:{h2h:'3-4-3',btts:'48%',o25:'42%'},xgH:50,xgA:50,
+    ia:`Derby nigérian très équilibré. Les deux équipes se neutralisent souvent avec des matchs fermés. Enyimba légèrement favoris à domicile mais Rangers en bonne forme récente.\n\n📊 4 des 10 dernières confrontations directes ont fini nul.\n\n✅ Recommandation : Nul ou 1 (double chance) @ 1.55\nConfiance : 🟡 Moyenne (52%)`
+  },
+];
+
+const LIVES = [
+  {home:'Man City',away:'Liverpool',sH:1,sA:2,time:"73'",league:'PL 🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
+  {home:'Real Madrid',away:'Séville',sH:3,sA:0,time:"82'",league:'Liga 🇪🇸'},
+  {home:'AC Milan',away:'Roma',sH:0,sA:0,time:"38'",league:'Serie A 🇮🇹'},
+  {home:'DC Motema',away:'Sanga Balende',sH:1,sA:1,time:"55'",league:'Vodacom 🇨🇩'},
+];
+
+function fd(r){const cls=r==='W'?'fw':r==='D'?'fdraw':'fl';return `<div class="fd ${cls}">${r}</div>`}
+function accCls(r){return r==='1'?'acc-1':r==='2'?'acc-2':'acc-n'}
+function resCls(r){return r==='1'?'r1':r==='2'?'r2':'rn'}
+
+function renderPronos(){
+  document.getElementById('pronoList').innerHTML = PRONOS.map((p,i) => `
+  <div class="pc${p.feat?' feat':''} rev" style="animation-delay:${i*.07}s">
+    <div class="acc ${accCls(p.res)}"></div>
+    ${p.feat?`<div class="ribbon">⚡ Vedette</div>`:''}
+    <div class="pm">
+      <div class="pl">${p.league}</div>
+      <div class="pt">${p.time}</div>
+    </div>
+    <div class="pb">
+      <div class="ts home">
+        <div class="tn">${p.home.name}</div>
+        <div class="tc">${p.home.country}</div>
+        <div class="fr">${p.home.form.map(fd).join('')}</div>
+      </div>
+      <div class="vc">
+        <div class="vl">VS</div>
+        <div class="gauge-wrap">
+          <div class="g-track">
+            <div class="g-h" id="gh${i}" style="width:0%"></div>
+            <div class="g-a" id="ga${i}" style="width:0%"></div>
+          </div>
+          <div class="g-nums"><span class="gnh">${p.home.str}%</span><span class="gna">${p.away.str}%</span></div>
+        </div>
+        <div class="pr ${resCls(p.res)}">
+          <div class="prl">Prono</div>
+          <div class="prv">${p.res}</div>
+          <div class="prc">${p.cote}</div>
+        </div>
+      </div>
+      <div class="ts away">
+        <div class="tn">${p.away.name}</div>
+        <div class="tc">${p.away.country}</div>
+        <div class="fr" style="flex-direction:row-reverse">${p.away.form.map(fd).join('')}</div>
+      </div>
+    </div>
+    <div class="sr">
+      <div class="stc"><div class="stv">${p.stats.h2h}</div><div class="stk">H2H V-N-D</div></div>
+      <div class="stc"><div class="stv">${p.stats.btts}</div><div class="stk">Les deux marquent</div></div>
+      <div class="stc"><div class="stv">${p.stats.o25}</div><div class="stk">+2.5 buts</div></div>
+    </div>
+    <div class="xgr">
+      <div class="xgl"><span>Buts attendus (xG estimés)</span><span class="xgt-tag">IA prédictif</span></div>
+      <div class="xg-track">
+        <div class="xgh" id="xh${i}" style="width:0%"></div>
+        <div class="xga" id="xa${i}" style="width:0%"></div>
+      </div>
+      <div class="xg-labs"><span class="xg-lh">${p.home.name}</span><span class="xg-la">${p.away.name}</span></div>
+    </div>
+    <div class="ia-bar">
+      <button class="ia-btn" onclick="toggleIA(${i},this)">
+        <span>🤖</span><span>Analyse IA complète</span>
+        <span class="ia-chip" id="chip${i}">voir</span>
+      </button>
+      <button class="wa-btn" onclick="shareWA(${i})">📱</button>
+    </div>
+    <div class="ia-panel" id="iap${i}">
+      <div class="ia-inner" id="iat${i}"></div>
+    </div>
+  </div>`).join('');
+
+  setTimeout(()=>{
+    PRONOS.forEach((p,i)=>{
+      const tot=p.home.str+p.away.str;
+      const hp=Math.round(p.home.str/tot*100);
+      const el=s=>document.getElementById(s);
+      if(el(`gh${i}`)) el(`gh${i}`).style.width=hp+'%';
+      if(el(`ga${i}`)) el(`ga${i}`).style.width=(100-hp)+'%';
+      if(el(`xh${i}`)) el(`xh${i}`).style.width=p.xgH+'%';
+      if(el(`xa${i}`)) el(`xa${i}`).style.width=p.xgA+'%';
+    });
+  },350);
+}
+
+const iaState={};
+function toggleIA(i,btn){
+  const panel=document.getElementById(`iap${i}`);
+  const chip=document.getElementById(`chip${i}`);
+  const open=panel.classList.toggle('open');
+  chip.textContent=open?'▲':'voir';
+  if(open&&!iaState[i]){
+    iaState[i]=true;
+    const el=document.getElementById(`iat${i}`);
+    el.innerHTML='<span class="cur"></span>';
+    const cur=el.querySelector('.cur');
+    let j=0;const chars=PRONOS[i].ia.split('');
+    setTimeout(()=>{
+      const iv=setInterval(()=>{
+        if(j>=chars.length){clearInterval(iv);cur.remove();return}
+        cur.insertAdjacentText('beforebegin',chars[j++]);
+      },13);
+    },500);
+  }
+}
+
+function shareWA(i){
+  const p=PRONOS[i];
+  const msg=`⚡ *PRONO live.cd*\n\n🏆 ${p.league}\n⚽ *${p.home.name} vs ${p.away.name}*\n🕐 ${p.time}\n\n✅ *${p.resLabel} @ ${p.cote}*\nForce: ${p.home.name} ${p.home.str}% · ${p.away.name} ${p.away.str}%\n\n${p.ia.split('\n').slice(0,4).join('\n')}\n\n📲 Tous les pronos → https://live.cd`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+  showToast('Partage WhatsApp ouvert !');
+}
+
+function renderLive(){
+  document.getElementById('matchList').innerHTML=LIVES.map((m,i)=>`
+  <div class="mr rev" style="animation-delay:${.55+i*.06}s">
+    <div class="mt h">${m.home}</div>
+    <div class="mc"><div class="ms">${m.sH}–${m.sA}</div><div class="mtime">${m.time} · ${m.league}</div></div>
+    <div class="mt a">${m.away}</div>
+  </div>`).join('');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
+}));
+document.querySelectorAll('.ni').forEach(n=>n.addEventListener('click',()=>{
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));n.classList.add('active');
+}));
+
+renderPronos();
+renderLive();
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+:root {
+  --green: #16a34a;
+  --green-b: #22c55e;
+  --green-glow: rgba(34, 197, 94, 0.15);
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --bg: #080808;
+  --bg2: #0f0f0f;
+  --bg3: #181818;
+  --bg4: #212121;
+  --border: rgba(255, 255, 255, 0.06);
+  --border2: rgba(255, 255, 255, 0.1);
+  --text: #f0f0f0;
+  --muted: #5a5a5a;
+  --dim: #2e2e2e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 78px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 35% at 50% -5%, rgba(22, 163, 74, 0.09) 0%, transparent 65%),
+    linear-gradient(rgba(22, 163, 74, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 163, 74, 0.022) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
