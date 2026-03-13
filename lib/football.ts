@@ -3,13 +3,13 @@ const KEY  = process.env.API_FOOTBALL_KEY!;
 const H    = { "x-apisports-key": KEY };
 
 export const LEAGUES = [
-  { id: 61,  name: "Ligue 1",           flag: "🇫🇷" },
-  { id: 39,  name: "Premier League",    flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
-  { id: 140, name: "La Liga",           flag: "🇪🇸" },
-  { id: 78,  name: "Bundesliga",        flag: "🇩🇪" },
-  { id: 135,  name: "Serie A",           flag: "🇮🇹" },
-  { id: 12,  name: "CAF Champions L.",  flag: "🌍" },
-  { id: 671, name: "Vodacom Ligue 1",   flag: "🇨🇩" },
+  { id: 61,  name: "Ligue 1",          flag: "🇫🇷" },
+  { id: 39,  name: "Premier League",   flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
+  { id: 140, name: "La Liga",          flag: "🇪🇸" },
+  { id: 78,  name: "Bundesliga",       flag: "🇩🇪" },
+  { id: 135, name: "Serie A",          flag: "🇮🇹" },  // ← 135 pas 71
+  { id: 12,  name: "CAF Champions L.", flag: "🌍" },
+  { id: 671, name: "Vodacom Ligue 1",  flag: "🇨🇩" },
 ];
 
 export const LEAGUE_IDS = LEAGUES.map((l) => l.id);
