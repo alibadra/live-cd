@@ -7,7 +7,7 @@ export const LEAGUES = [
   { id: 39,  name: "Premier League",    flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
   { id: 140, name: "La Liga",           flag: "🇪🇸" },
   { id: 78,  name: "Bundesliga",        flag: "🇩🇪" },
-  { id: 71,  name: "Serie A",           flag: "🇮🇹" },
+  { id: 135,  name: "Serie A",           flag: "🇮🇹" },
   { id: 12,  name: "CAF Champions L.",  flag: "🌍" },
   { id: 671, name: "Vodacom Ligue 1",   flag: "🇨🇩" },
 ];
