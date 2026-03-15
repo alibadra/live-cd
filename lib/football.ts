@@ -13,7 +13,7 @@ export const LEAGUES = [
 ];
 
 export const LEAGUE_IDS = LEAGUES.map((l) => l.id);
-const SEASON = new Date().getFullYear();
+const SEASON = 2025;
 
 // ── Matchs du jour ────────────────────────────────────────────────────────
 export async function getMatchsDuJour(): Promise<any[]> {
