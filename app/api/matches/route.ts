@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     // Récupère les classements de toutes les ligues présentes (en parallèle)
-    const leagueIds = [...new Set(fixtures.map((f: any) => f.league.id as number))];
+    const leagueIds = Array.from(new Set(fixtures.map((f: any) => f.league.id as number)));
     const classements: Record<number, any[]> = {};
     await Promise.all(
       leagueIds.map(async (id) => {
