@@ -7,53 +7,40 @@ export const LEAGUES = [
   { id: 39,  name: "Premier League",   flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
   { id: 140, name: "La Liga",          flag: "🇪🇸" },
   { id: 78,  name: "Bundesliga",       flag: "🇩🇪" },
-  { id: 135, name: "Serie A",          flag: "🇮🇹" },  // ← 135 = Italie
+  { id: 135, name: "Serie A",          flag: "🇮🇹" },
   { id: 12,  name: "CAF Champions L.", flag: "🌍" },
   { id: 671, name: "Vodacom Ligue 1",  flag: "🇨🇩" },
 ];
 
 export const LEAGUE_IDS = LEAGUES.map((l) => l.id);
+const SEASON = new Date().getFullYear();
 
-// ── 1 seul appel pour tous les matchs du jour ──────────────────────────────
+// ── Matchs du jour ────────────────────────────────────────────────────────
 export async function getMatchsDuJour(): Promise<any[]> {
   const today = new Date().toISOString().split("T")[0];
-
   const res = await fetch(
     `${BASE}/fixtures?date=${today}&timezone=Africa%2FKinshasa`,
-    {
-      headers: H,
-      next: { revalidate: 300 }, // cache Next.js 5 min
-    }
+    { headers: H, next: { revalidate: 300 } }
   );
-
   if (!res.ok) throw new Error(`API-Football /fixtures: ${res.status}`);
   const data = await res.json();
-
   return (data.response ?? [])
     .filter((f: any) => LEAGUE_IDS.includes(f.league.id))
-    .slice(0, 10); // max 10 matchs
+    .slice(0, 10);
 }
 
-// ── Stats saison (cache 24h — données lentes) ─────────────────────────────
-export async function getStatsEquipe(
-  teamId: number,
-  leagueId: number,
-  season: number
-): Promise<any | null> {
+// ── Classement d'une ligue (1 appel, très fiable) ────────────────────────
+export async function getClassement(leagueId: number): Promise<any[]> {
   const res = await fetch(
-    `${BASE}/teams/statistics?team=${teamId}&league=${leagueId}&season=${season}`,
-    {
-      headers: H,
-      next: { revalidate: 86400 },
-    }
+    `${BASE}/standings?league=${leagueId}&season=${SEASON}`,
+    { headers: H, next: { revalidate: 3600 } } // cache 1h
   );
-
-  if (!res.ok) return null;
+  if (!res.ok) return [];
   const data = await res.json();
-  return data.response ?? null;
+  // Retourne la liste à plat des équipes du classement
+  return data.response?.[0]?.league?.standings?.[0] ?? [];
 }
 
-// ── Flag depuis l'id de ligue ─────────────────────────────────────────────
 export function getFlagForLeague(leagueId: number): string {
   return LEAGUES.find((l) => l.id === leagueId)?.flag ?? "🏆";
 }
