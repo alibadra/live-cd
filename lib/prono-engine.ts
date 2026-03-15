@@ -8,16 +8,24 @@ export function formeFromString(formStr?: string): string[] {
 export function calculerForce(stats: any): number {
   if (!stats) return 50;
 
-  const played   = stats.fixtures?.played?.total       ?? 1;
+  const played   = stats.fixtures?.played?.total       ?? 0;
   const wins     = stats.fixtures?.wins?.total          ?? 0;
+  const draws    = stats.fixtures?.draws?.total         ?? 0;
   const goals    = stats.goals?.for?.total?.total       ?? 0;
   const conceded = stats.goals?.against?.total?.total   ?? 0;
 
-  const winRate = (wins / played) * 40;                          // max 40
-  const attack  = Math.min((goals / played) * 10, 30);          // max 30
-  const defense = Math.max(30 - (conceded / played) * 10, 0);   // max 30
+  // Pas assez de données — différencie quand même par les buts
+  if (played < 3) {
+    const goalDiff = goals - conceded;
+    return Math.min(Math.max(50 + goalDiff * 3, 20), 80);
+  }
 
-  return Math.round(Math.min(winRate + attack + defense, 99));
+  const winRate  = (wins / played) * 40;
+  const drawRate = (draws / played) * 10;
+  const attack   = Math.min((goals / played) * 10, 30);
+  const defense  = Math.max(30 - (conceded / played) * 10, 0);
+
+  return Math.round(Math.min(winRate + drawRate + attack + defense, 99));
 }
 
 // ── Prono automatique avec avantage domicile ─────────────────────────────

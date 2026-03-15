@@ -2,18 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "live.cd — Pronos & Scores",
-  description: "Pronostics foot IA, scores en direct, actu sport RDC et monde",
-  manifest: "/manifest.json",
-  themeColor: "#080808",
-  viewport: "width=device-width, initial-scale=1.0, viewport-fit=cover",
+  title: "live.cd — Pronostics Foot IA & Scores en Direct",
+  description: "Pronostics football par intelligence artificielle. Scores live, analyses IA, Vodacom Ligue 1 RDC, Premier League, Ligue 1, CAF Champions League.",
+  keywords: "pronostics foot, scores live, football RDC, Congo, Vodacom Ligue, pronos IA",
+  openGraph: {
+    title: "live.cd — Pronos Foot IA",
+    description: "Pronostics football IA, scores en direct RDC et monde",
+    url: "https://live.cd",
+    siteName: "live.cd",
+    locale: "fr_CD",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+  alternates: { canonical: "https://live.cd" },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <head>
