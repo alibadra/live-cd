@@ -13,6 +13,11 @@ export const metadata: Metadata = {
     locale: "fr_CD",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "live.cd — Pronos Foot IA",
+    description: "Pronostics football IA, scores en direct",
+  },
   robots: { index: true, follow: true },
   alternates: { canonical: "https://live.cd" },
 };
